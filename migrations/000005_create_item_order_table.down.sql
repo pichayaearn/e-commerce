@@ -1,0 +1,1 @@
+DROP TABLE "order"."order_items"

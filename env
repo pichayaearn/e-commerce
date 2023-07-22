@@ -1,0 +1,21 @@
+#!/bin/bash
+
+ENVPATH=$1
+
+echo "sourcing $ENVPATH"
+
+if [ -z $ENVPATH ]; then
+  echo "Usage: source ./runenv [CMD]"
+  echo "Example: source ./runenv api"
+  return
+fi
+
+while read i; do
+  if [ -z "$i" ]; then
+    echo "."
+  elif [[ $i = '#'* ]]; then
+    continue
+  else
+    export "$i"
+  fi
+done < cmd/$ENVPATH/.env

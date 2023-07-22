@@ -1,0 +1,1 @@
+ALTER TABLE "product"."products" ALTER COLUMN "amount" DROP NOT NULL;
