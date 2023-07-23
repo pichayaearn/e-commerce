@@ -15,7 +15,12 @@ type GetListOrderCfgs struct {
 
 func GetListorder(cfg GetListOrderCfgs) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		req := new(serializer.GetListOrderReq)
+		userID, err := BindUserIDFromContext(c)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusForbidden, "Bind user id "+err.Error())
+		}
+
+		req := serializer.NewGetListOrderReq(userID)
 
 		// Use BindJSON() to bind the request body as JSON into the user struct
 		if err := c.Bind(req); err != nil {
@@ -27,14 +32,10 @@ func GetListorder(cfg GetListOrderCfgs) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body: "+err.Error())
 		}
 
-		var orderID, userID uuid.UUID
+		var orderID uuid.UUID
 		if req.OrderID != "" {
 			orderID = uuid.MustParse(req.OrderID)
 
-		}
-
-		if req.UserID != "" {
-			userID = uuid.MustParse(req.UserID)
 		}
 
 		orders, err := cfg.OrderSvc.List(model.GetOrder{

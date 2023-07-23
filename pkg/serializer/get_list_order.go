@@ -11,8 +11,9 @@ import (
 )
 
 type GetListOrderReq struct {
-	UserID  string `json:"user_id" query:"user_id"`
 	OrderID string `json:"order_id" query:"order_id"`
+
+	UserID uuid.UUID
 }
 
 func (r GetListOrderReq) ValidateRequest() error {
@@ -20,6 +21,12 @@ func (r GetListOrderReq) ValidateRequest() error {
 		validation.Field(&r.UserID, is.UUIDv4),
 		validation.Field(&r.OrderID, is.UUIDv4),
 	)
+}
+
+func NewGetListOrderReq(userID uuid.UUID) *GetListOrderReq {
+	return &GetListOrderReq{
+		UserID: userID,
+	}
 }
 
 type GetListOrderResponse struct {

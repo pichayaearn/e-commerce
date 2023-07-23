@@ -6,6 +6,7 @@ import (
 	validator "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserStatus string
@@ -58,10 +59,14 @@ func (u *User) Validate(additionalRules ...*validator.FieldRules) error {
 func NewUser(email, password string) (*User, error) {
 	userID := uuid.New()
 	now := time.Now()
+	encryptPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return nil, err
+	}
 	user := User{
 		userID:    userID,
 		email:     email,
-		password:  password,
+		password:  string(encryptPassword),
 		status:    UserStatusActived,
 		createdAt: now,
 		updatedAt: now,

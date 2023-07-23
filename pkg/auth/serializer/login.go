@@ -13,3 +13,13 @@ func (r LoginReq) ValidateRequest() error {
 		validation.Field(&r.Password, validation.Required),
 	)
 }
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
+func ToLoginResponse(token string) LoginResponse {
+	return LoginResponse{
+		Token: token,
+	}
+}

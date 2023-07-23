@@ -4,15 +4,15 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pichayaearn/e-commerce/pkg/serializer"
+	"github.com/pichayaearn/e-commerce/pkg/auth/model"
+	"github.com/pichayaearn/e-commerce/pkg/auth/serializer"
 )
 
-type jwtCustomClaims struct {
-	Email string `json:"email"`
-	// jwt.RegisteredClaims
+type LoginCfg struct {
+	AuthSvc model.AuthSvc
 }
 
-func Login() echo.HandlerFunc {
+func Login(cfg LoginCfg) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := new(serializer.LoginReq)
 
@@ -26,15 +26,14 @@ func Login() echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body: "+err.Error())
 		}
 
-		// Create a JWT token
-		// claims := &jwtCustomClaims{
-		// 	Email: req.Email,
-		// 	jwt.RegisteredClaims{
-		// 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
-		// 	},
-		// }
+		token, err := cfg.AuthSvc.Login(req.Email, req.Password)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "Login failed: "+err.Error())
+		}
 
-		return c.NoContent(200)
+		resp := serializer.ToLoginResponse(token)
+
+		return c.JSON(200, resp)
 
 	}
 }

@@ -22,6 +22,8 @@ type Config struct {
 	Environment string `split_words:"true" required:"true"`
 	Debug       bool   `split_words:"true" default:"false"`
 
+	SecretKey string `split_words:"true" default:"false"`
+
 	//DB
 	DB DBConfig `split_words:"true" required:"true"`
 }

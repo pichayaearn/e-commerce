@@ -1,8 +1,10 @@
 package route
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	model "github.com/pichayaearn/e-commerce/pkg/model/user"
 	"github.com/pichayaearn/e-commerce/pkg/serializer"
@@ -14,12 +16,12 @@ type GetUserProfileCfg struct {
 
 func GetUserProfile(cfg GetUserProfileCfg) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		req := new(serializer.UserProfileReq)
-
-		// Use BindJSON() to bind the request body as JSON into the user struct
-		if err := c.Bind(req); err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
+		userID, err := BindUserIDFromContext(c)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusForbidden, "Bind user id "+err.Error())
 		}
+
+		req := serializer.NewUserProfileRequest(userID)
 
 		//validate request
 		if err := req.ValidateRequest(); err != nil {
@@ -37,4 +39,15 @@ func GetUserProfile(cfg GetUserProfileCfg) echo.HandlerFunc {
 		return c.JSON(http.StatusOK, resp)
 
 	}
+}
+
+func BindUserIDFromContext(c echo.Context) (uuid.UUID, error) {
+	userID := c.Get("UserID")
+	userIDStr, ok := userID.(string)
+	if !ok {
+		return uuid.Nil, fmt.Errorf("user id not string")
+	}
+
+	uid := uuid.MustParse(userIDStr)
+	return uid, nil
 }

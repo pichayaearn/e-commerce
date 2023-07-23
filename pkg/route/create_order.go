@@ -15,7 +15,12 @@ type CreateOrderCfgs struct {
 
 func CreateOrder(cfg CreateOrderCfgs) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		req := new(serializer.CreateOrderReq)
+		userID, err := BindUserIDFromContext(c)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusForbidden, "Bind user id "+err.Error())
+		}
+
+		req := serializer.NewCreateOrderReq(userID)
 
 		// Use BindJSON() to bind the request body as JSON into the user struct
 		if err := c.Bind(req); err != nil {
@@ -36,7 +41,6 @@ func CreateOrder(cfg CreateOrderCfgs) echo.HandlerFunc {
 			})
 		}
 
-		userID := uuid.MustParse(req.UserID)
 		if err := cfg.OrderSvc.CreateOrder(model.CreateOrder{
 			UserID:       userID,
 			ProductItems: items,

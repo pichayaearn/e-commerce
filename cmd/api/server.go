@@ -3,9 +3,13 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/pichayaearn/e-commerce/cmd/api/config"
+	authRoute "github.com/pichayaearn/e-commerce/pkg/auth/route"
+	authSvc "github.com/pichayaearn/e-commerce/pkg/auth/svc"
+	"github.com/pichayaearn/e-commerce/pkg/middleware"
 	"github.com/pichayaearn/e-commerce/pkg/repo"
 	"github.com/pichayaearn/e-commerce/pkg/route"
 	"github.com/pichayaearn/e-commerce/pkg/svc"
+
 	"github.com/sirupsen/logrus"
 	"github.com/uptrace/bun/extra/bundebug"
 )
@@ -42,6 +46,14 @@ func newServer(cfg *config.Config) *echo.Echo {
 		ProductSvc:     productSvc,
 		UserSvc:        userSvc,
 	})
+	authSvc := authSvc.NewAuthSvc(authSvc.NewAuthSvcCfg{
+		UserSvc:   userSvc,
+		SecretKey: cfg.SecretKey,
+	})
+
+	mw := middleware.Authenticate{
+		Secret: cfg.SecretKey,
+	}
 
 	e.POST("/sign-up", route.CreateUser(route.CreateUserCfg{
 		UserSvc: userSvc,
@@ -49,7 +61,7 @@ func newServer(cfg *config.Config) *echo.Echo {
 
 	e.GET("/user-profile", route.GetUserProfile(route.GetUserProfileCfg{
 		UserProfileSvc: userProfileSvc,
-	}))
+	}), mw.Authenticate)
 
 	e.GET("/list-products", route.GetListProducts(route.GetProductCfgs{
 		ProductSvc: productSvc,
@@ -57,14 +69,18 @@ func newServer(cfg *config.Config) *echo.Echo {
 
 	e.POST("/orders", route.CreateOrder(route.CreateOrderCfgs{
 		OrderSvc: orderSvc,
-	}))
+	}), mw.Authenticate)
 
 	e.GET("/orders", route.GetListorder(route.GetListOrderCfgs{
 		OrderSvc: orderSvc,
-	}))
+	}), mw.Authenticate)
 
 	e.PATCH("/cancel", route.CancelOrder(route.CancelOrderCfgs{
 		OrderSvc: orderSvc,
+	}), mw.Authenticate)
+
+	e.POST("/login", authRoute.Login(authRoute.LoginCfg{
+		AuthSvc: authSvc,
 	}))
 
 	return e

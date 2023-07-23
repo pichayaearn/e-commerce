@@ -13,6 +13,12 @@ type UserProfileReq struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
+func NewUserProfileRequest(userID uuid.UUID) *UserProfileReq {
+	return &UserProfileReq{
+		UserID: userID,
+	}
+}
+
 func (up UserProfileReq) ValidateRequest() error {
 	return validation.ValidateStruct(&up,
 		validation.Field(&up.UserID, validation.Required, is.UUIDv4),
