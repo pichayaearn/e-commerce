@@ -11,13 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Staticcheck
-        run: staticcheck -checks all,-U1000,-ST1000 ./...
-
       - name: Set up go
         uses: actions/setup-go@v2
         with:
           go-version: 1.18
+      
+      - name: Install staticcheck
+        run: go get honnef.co/go/tools/cmd/staticcheck
+
+      - name: Run staticcheck
+        run: staticcheck -checks all,-U1000,-ST1000 ./app/...
       
       - name: Build
         run: go build -v ./...
