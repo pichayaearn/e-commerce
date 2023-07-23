@@ -17,7 +17,7 @@ func GetListorder(cfg GetListOrderCfgs) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		userID, err := BindUserIDFromContext(c)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusForbidden, "Bind user id "+err.Error())
+			return echo.NewHTTPError(http.StatusBadRequest, "Bind user id "+err.Error())
 		}
 
 		req := serializer.NewGetListOrderReq(userID)

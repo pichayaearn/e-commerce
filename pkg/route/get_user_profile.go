@@ -48,6 +48,9 @@ func BindUserIDFromContext(c echo.Context) (uuid.UUID, error) {
 		return uuid.Nil, fmt.Errorf("user id not string")
 	}
 
-	uid := uuid.MustParse(userIDStr)
+	uid, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("parse user id to uuid")
+	}
 	return uid, nil
 }

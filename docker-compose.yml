@@ -19,6 +19,11 @@ services:
       timeout: 5s
       retries: 5
 
+  my_app_service:
+    image: app
+    env_file:
+      - ./cmd/api/.env
+
 
 networks:
   e_commerce:

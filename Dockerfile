@@ -1,22 +1,15 @@
-FROM golang:1.18-buster AS builder
+ARG GO_VERSION=1.18
+FROM golang:${GO_VERSION}-alpine as builder
 
-ARG VERSION=dev
-
+ARG MAIN_APP=./cmd/api
+RUN mkdir /app
+COPY . /app
 WORKDIR /app
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
-COPY . .
+RUN go build -ldflags="-w -s" -o main ./cmd/api
 
-RUN go build -o main -ldflags=-X=main.version=${VERSION} ./cmd/api/
-
-FROM alpine:latest
-
-# Set the working directory inside the container
+FROM alpine
+RUN mkdir /app
 WORKDIR /app
-
-# Copy the binary from the builder stage into this new image
-COPY --from=builder /app/main .
-
-# Run the binary when the container starts
-CMD ["main"]
+COPY --from=builder /app .
+EXPOSE 1323
+CMD ["/app/main"]

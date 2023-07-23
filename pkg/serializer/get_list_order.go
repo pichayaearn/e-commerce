@@ -18,7 +18,7 @@ type GetListOrderReq struct {
 
 func (r GetListOrderReq) ValidateRequest() error {
 	return validation.ValidateStruct(&r,
-		validation.Field(&r.UserID, is.UUIDv4),
+		validation.Field(&r.UserID, validation.Required, is.UUIDv4),
 		validation.Field(&r.OrderID, is.UUIDv4),
 	)
 }
