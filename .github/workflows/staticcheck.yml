@@ -1,0 +1,25 @@
+name: Staticcheck
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  staticcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
+      - name: Install staticcheck
+        run: go get honnef.co/go/tools/cmd/staticcheck
+
+      - name: Run staticcheck
+        run: staticcheck -checks all,-U1000,-ST1000 ./app/...
