@@ -1,4 +1,4 @@
-CREATE SCHEMA "user"
+CREATE SCHEMA "user";
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE "user"."users" (
     "id" BIGSERIAL PRIMARY KEY,
