@@ -83,6 +83,8 @@ func newServer(cfg *config.Config) *echo.Echo {
 		AuthSvc: authSvc,
 	}))
 
+	e.POST("/validate-pin", route.ValidatePin())
+
 	return e
 
 }
